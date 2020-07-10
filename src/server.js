@@ -11,20 +11,16 @@ const app = express();
 app.use(express.json());
 
 app.get('/', async (req, res) => {
-    return res.status(200).json({
-        "message": "FireAPI - Powering FireApp since 2020"
-    })
+    res.sendFile(__dirname + '/html/index.html')
 })
 
 app.get('/fires', async (req, res) => {
     let auth = req.headers.authorization;
     if(!auth) {
-        console.log('no auth')
         res.status(401).send()
         return
     }
     if(!await KeyModel.findOne({ key:auth })) {
-        console.log('incorrect auth')
         res.status(401).send()
         return
     }
