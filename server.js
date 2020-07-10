@@ -81,6 +81,7 @@ app.post('/fires', async (req, res) => {
         let newModel = new FireModel({ 
             locCode: locCode,
             fires: [{ 
+                id: 1,
                 description: description,
                 severity: severity,
                 active: true,
@@ -93,8 +94,21 @@ app.post('/fires', async (req, res) => {
             res.status(500).send();
             return;
         })
+        return res.status(201).json({
+            "message": `Fire created in location code ${locCode} with ID ${parseInt('1')}.`
+        }).send()
     } else {
+        let idNo;
+        try {
+            idNo = Number(FireModelForLoc.fires[FireModelForLoc.fires.length - 1].id + 1);
+        } catch (error) {
+            idNo = undefined
+            return res.status(500).json({
+                "stack":error
+            })
+        }
         FireModelForLoc.fires.push({
+            id: idNo,
             description: description, 
             severity: severity, 
             active: true, 
@@ -106,10 +120,45 @@ app.post('/fires', async (req, res) => {
             res.status(500).send();
             return;
         })
+        return res.status(201).json({
+            "message": `Fire created in location code ${locCode} with ID ${idNo}.`
+        }).send()
     }
+})
 
-    res.status(201).send();
-    return;
+app.delete('/fires', async (req, res) => {
+    let auth = req.headers.authorization;
+    if(!auth) return res.status(401).send();
+    let dbEntry = await KeyModel.findOne({ key:auth });
+    if(!dbEntry) return res.status(401).send();
+    if(dbEntry.authLevel < 1) return res.status(401).send()
+
+    let locCode = req.query.locCode;
+    if(!locCode) {
+        return res.status(400).json({
+            "message": "Provide a location code to delete."
+        }).send()
+    }
+    let dbLoc = await FireModel.findOne({ locCode: locCode })
+    if(!dbLoc) {
+        return res.status(404).json({
+            "message": "This location code does not exist in the database. \nThis generally means that either the code is invalid or no fires have ever occurred in the area."
+        }).send();
+    } else {
+        await dbLoc.deleteOne().catch(err => {
+            console.error(err)
+            res.status(500).send();
+        });
+        return res.status(200).send();
+    }
+})
+
+app.patch('/fires', async (req, res) => {
+    let auth = req.headers.authorization;
+    if(!auth) return res.status(401).send();
+    auth = await KeyModel.findOne({ key: auth });
+    if(!auth) return res.status(401).send();
+    if(auth.authLevel < 1) return res.status(401).send();
 })
 
 app.listen(process.env.PORT);
