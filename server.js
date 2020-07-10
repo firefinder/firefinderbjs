@@ -22,11 +22,15 @@ app.get('/fires', async (req, res) => {
     
     let code = req.query.locCode;
     if(!code) {
-        res.status(400).send();
+        res.status(400).json({
+            "message": "Please provide a location code (locCode parameter)"
+        }).send()
         return;
     }
     if(typeof code !== 'number') {
-        res.status(400).send();
+        res.status(400).json({
+            "message": "Location codes must be presented in integer format."
+        }).send()
         return;
     }
     let locationFind = await FireModel.findOne({ locCode: code });
