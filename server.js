@@ -81,7 +81,7 @@ app.post('/fires', async (req, res) => {
         let newModel = new FireModel({ 
             locCode: locCode,
             fires: [{ 
-                id: 1,
+                id: 0,
                 description: description,
                 severity: severity,
                 active: true,
@@ -95,7 +95,7 @@ app.post('/fires', async (req, res) => {
             return;
         })
         return res.status(201).json({
-            "message": `Fire created in location code ${locCode} with ID ${parseInt('1')}.`
+            "message": `Fire created in location code ${locCode} with ID ${parseInt('0')}.`
         }).send()
     } else {
         let idNo;
@@ -159,6 +159,59 @@ app.patch('/fires', async (req, res) => {
     auth = await KeyModel.findOne({ key: auth });
     if(!auth) return res.status(401).send();
     if(auth.authLevel < 1) return res.status(401).send();
+
+    let fireLoc = parseInt(req.query.locCode)
+    let fireID = parseInt(req.query.id)
+    let action = req.query.action
+
+    if(!fireLoc || !fireID) return res.status(400).send();
+    let locationDBEntry = await FireModel.findOne({ locCode: fireLoc });
+    if(!locationDBEntry) return res.status(400).json({
+        "message": "The provided fire location does not exist in the database."
+    }).send();
+    let specificFire = locationDBEntry.fires.find(element => element.id === fireID);
+    if(!specificFire) return res.status(400).json({
+        "message": "The specified fire ID does not exist in the database."
+    }).send();
+
+    switch (action) {
+        case 'disable': {
+            try {
+                // await locationDBEntry.updateOne({ ['fires[' + Number(fireID - 1) + '].active']:false });
+                locationDBEntry.fires[Number(fireID - 1)].active = false;
+                locationDBEntry.save().catch((err) => {
+                    res.status(500).json({
+                        "error":err
+                    }).send()
+                })
+            } catch (error) {
+                return res.status(500).json({
+                    "error": error
+                })
+            }
+            res.status(200).send()
+        }
+        break;
+        case 'enable': {
+            try {
+                locationDBEntry.fires[Number(fireID - 1)].active = true;
+                locationDBEntry.save().catch((err) => {
+                    return res.status(500).json({
+                        "error":err
+                    }).send()
+                })
+            } catch (error) {
+                return res.status(500).send({
+                    "error":error
+                })
+            }
+            res.status(200).send();
+        }
+        break;
+        default: {
+            return res.status(400).send();
+        }
+    }
 })
 
 app.listen(process.env.PORT);
