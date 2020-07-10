@@ -2,7 +2,8 @@ const express = require('express');
 const { connect } = require('mongoose');
 const KeyModel = require('./models/Key');
 const FireModel = require('./models/Fire');
-const dotenv = require('dotenv')
+const moment = require('moment');
+const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
@@ -27,7 +28,7 @@ app.get('/fires', async (req, res) => {
         }).send()
         return;
     }
-    if(typeof code !== 'number') {
+    if(isNaN(code)) {
         res.status(400).json({
             "message": "Location codes must be presented in integer format."
         }).send()
@@ -40,7 +41,7 @@ app.get('/fires', async (req, res) => {
         }).send()
         return;
     } else {
-        let activeFires = locationFind.fires.map(object => object.active === true);
+        let activeFires = locationFind.fires.filter(object => object.active === true);
         if(activeFires.length < 1) {
             res.status(200).json({
                 "message": "There are no active fires for this area."
@@ -82,7 +83,7 @@ app.post('/fires', async (req, res) => {
                 severity: severity,
                 active: true,
                 timestamp: Date.now(),
-                humanFriendlyTimestamp: Date.toString(),
+                humanFriendlyTimestamp: moment().format("HH:mma ddd D/M/YY"),
                 instantiatedBy: auth 
             }]
         });
@@ -96,8 +97,7 @@ app.post('/fires', async (req, res) => {
             severity: severity, 
             active: true, 
             timestamp: Date.now(), 
-            humanFriendlyTimestamp: 
-            Date.now().toString(), 
+            humanFriendlyTimestamp: moment().format("h:mma ddd D/M/YY"), 
             instantiatedBy: auth
         })
         await FireModelForLoc.save().catch(() => {
