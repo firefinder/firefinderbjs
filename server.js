@@ -19,7 +19,31 @@ app.get('/fires', async (req, res) => {
         res.status(401).send()
         return
     }
-    res.status(200).send();
+    
+    let code = req.query.locCode;
+    if(!code) {
+        res.status(400).send();
+        return;
+    }
+    if(typeof code != Number) return;
+    let locationFind = await FireModel.findOne({ locCode: code });
+    if(!locationFind) {
+        res.status(200).json({
+            "message": "You provided an invalid location code, generally meaning you made a mistake in the request or there are no active fires in the area."
+        }).send()
+        return;
+    } else {
+        let activeFires = locationFind.fires.map(object => object.active === true);
+        if(activeFires.length < 1) {
+            res.status(200).json({
+                "message": "There are no active fires for this area."
+            }).send()
+            return;
+        } else {
+            res.status(200).json(activeFires).send();
+            return;
+        }
+    }
 })
 
 app.post('/fires', async (req, res) => {
