@@ -25,7 +25,10 @@ app.get('/fires', async (req, res) => {
         res.status(400).send();
         return;
     }
-    if(typeof code != Number) return;
+    if(typeof code !== 'number') {
+        res.status(400).send();
+        return;
+    }
     let locationFind = await FireModel.findOne({ locCode: code });
     if(!locationFind) {
         res.status(200).json({
