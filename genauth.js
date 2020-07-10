@@ -1,10 +1,12 @@
 const hat = require('hat');
 const { connect } = require('mongoose');
 const KeyModel = require('./models/Key')
+const dotenv = require('dotenv')
+dotenv.config()
 const key = hat();
 
 (async () => {
-    await connect('mongodb://localhost:27017/fireappbackend', {
+    await connect(`mongodb+srv://flameless:${process.env.DBPASS}@cluster0.g2go6.mongodb.net/fireapi?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useFindAndModify: false,
         useUnifiedTopology: true

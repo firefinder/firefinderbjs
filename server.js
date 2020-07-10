@@ -82,7 +82,7 @@ app.post('/fires', async (req, res) => {
 app.listen(process.env.PORT);
 
 (async () => {
-    await connect('mongodb://localhost:27017/fireappbackend', {
+    await connect(`mongodb+srv://flameless:${process.env.DBPASS}@cluster0.g2go6.mongodb.net/fireapi?retryWrites=true&w=majority`, {
         useUnifiedTopology: true,
         useFindAndModify: false,
         useNewUrlParser: true
