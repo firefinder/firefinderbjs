@@ -10,6 +10,12 @@ const app = express();
 
 app.use(express.json());
 
+app.get('/', async (req, res) => {
+    return res.status(200).json({
+        "message": "FireAPI - Powering FireApp since 2020"
+    })
+})
+
 app.get('/fires', async (req, res) => {
     let auth = req.headers.authorization;
     if(!auth) {
