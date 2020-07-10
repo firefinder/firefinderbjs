@@ -13,10 +13,12 @@ app.use(express.json());
 app.get('/fires', async (req, res) => {
     let auth = req.headers.authorization;
     if(!auth) {
+        console.log('no auth')
         res.status(401).send()
         return
     }
     if(!await KeyModel.findOne({ key:auth })) {
+        console.log('incorrect auth')
         res.status(401).send()
         return
     }
