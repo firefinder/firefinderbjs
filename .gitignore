@@ -1,8 +1,3 @@
+dev/
 node_modules/
 .env
-dev/
-.eslintrc.json
-genauth.js
-package-lock.json
-package.json
-request.rest
