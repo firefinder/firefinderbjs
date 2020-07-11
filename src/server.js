@@ -2,11 +2,21 @@ const express = require('express');
 const { connect } = require('mongoose');
 const KeyModel = require('../models/Key');
 const FireModel = require('../models/Fire');
+const WebSocketManager = require('./WebSocketManager');
+const socket = require('socket.io')
+const http = require('http');
 const moment = require('moment');
 const dotenv = require('dotenv');
 dotenv.config();
+const port = process.env.PORT || 4000;
 
-const app = express();
+const app = express()
+let server = http.createServer(app)
+const io = socket(server);
+
+io.sockets.on('connect', function() {
+    console.log('A new client connected!')
+})
 
 app.use(express.json());
 
