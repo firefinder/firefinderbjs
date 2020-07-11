@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/', async (req, res) => {
-    res.sendFile('../html/index.html')
+    res.sendFile(process.cwd() + '/html/index.html')
 })
 
 app.get('/fires', async (req, res) => {
