@@ -5,12 +5,14 @@ const chalk = require('chalk');
  * GeneralLog is the manager for all logs.
  * @param {Message} message The message used for the log.
  * @param {?displayType} displayType The display method returned for the log.
- * @param {?internal} internal Whether or not the function is being called internally.
+ * @param {?type} type Where this function is being called from (this file, WebSocketManager)
 */
 
 class GeneralLog {
-    constructor(_displayType) {
-        // this.message = message;
+    constructor(_displayType, notifyInternally) {
+        if(notifyInternally === undefined) {
+            notifyInternally = true;
+        }
         this.displayType;
         let warnBC = false;
         switch(_displayType) {
@@ -26,15 +28,15 @@ class GeneralLog {
             break;
         }
         // this.logManager = new GeneralLog(this.displayType);
-        if(warnBC === true) {
-            console.log(this.warnLog(`No display type was provided, using display type ${chalk.cyan(this.displayType)}`, true))
-        } else {
-            console.log(this.infoLog(`Using display type ${chalk.cyan(this.displayType)}`, true));
+        if(warnBC === true && notifyInternally === true) {
+            console.log(this.warnLog(`No display type was provided, using display type ${chalk.cyan(this.displayType)}`, 'internal'))
+        } else if(notifyInternally === true) {
+            console.log(this.infoLog(`Using display type ${chalk.cyan(this.displayType)}`, 'internal'));
         }
     }
     
-    warnLog(message, internal) {
-        if(!internal) {
+    warnLog(message, type) {
+        if(!type) {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -43,7 +45,7 @@ class GeneralLog {
             else if(this.displayType === 'minimal') {
                 return `${chalk.yellow('[WARN]')} ${message}`;
             }
-        } else {
+        } else if(type === 'internal') {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -52,11 +54,20 @@ class GeneralLog {
             else if(this.displayType === 'minimal') {
                 return `${chalk.yellow('[WARN]')} ${chalk.cyan('[INTERNAL]')} ${message}`;
             }
+        } else if(type === 'ws') {
+            if(!message) return console.log(errorLog('No message was provided to use.'));
+
+            if(this.displayType === 'detailed') {
+                return `${chalk.yellow('[WARN]')} ${chalk.cyan('[WEBSOCKET]')} ${chalk.gray(`[${moment().format('HH:mm:ss DD/MM/YY')}]`)} ${message}`;
+            } 
+            else if(this.displayType === 'minimal') {
+                return `${chalk.yellow('[WARN]')} ${chalk.cyan('[WEBSOCKET]')} ${message}`;
+            }
         }
     }
 
-    infoLog(message, internal) {
-        if(!internal) {
+    infoLog(message, type) {
+        if(!type) {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -65,7 +76,7 @@ class GeneralLog {
             else if(this.displayType === 'minimal') {
                 return `${chalk.green('[INFO]')} ${message}`;
             }
-        } else {
+        } else if(type === 'internal') {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -74,11 +85,20 @@ class GeneralLog {
             else if(this.displayType === 'minimal') {
                 return `${chalk.green('[INFO]')} ${chalk.cyan('[INTERNAL]')} ${message}`;
             }
+        } else if(type === 'ws') {
+            if(!message) return console.log(errorLog('No message was provided to use.'));
+
+            if(this.displayType === 'detailed') {
+                return `${chalk.green('[INFO]')} ${chalk.cyan('[WEBSOCKET]')} ${chalk.gray(`[${moment().format('HH:mm:ss DD/MM/YY')}]`)} ${message}`;
+            } 
+            else if(this.displayType === 'minimal') {
+                return `${chalk.green('[INFO]')} ${chalk.cyan('[WEBSOCKET]')} ${message}`;
+            }
         }
     }
     
-    errorLog(message, internal) {
-        if(!internal) {
+    errorLog(message, type) {
+        if(!type) {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -87,7 +107,7 @@ class GeneralLog {
             else if(this.displayType === 'minimal') {
                 return `${chalk.red('[ERROR]')} ${message}`;
             }
-        } else {
+        } else if(type === 'internal') {
             if(!message) return console.log(errorLog('No message was provided to use.'));
 
             if(this.displayType === 'detailed') {
@@ -95,6 +115,15 @@ class GeneralLog {
             }
             else if(this.displayType === 'minimal') {
                 return `${chalk.red('[ERROR]')} ${chalk.cyan('[INTERNAL]')} ${message}`;
+            }
+        } else if(type === 'ws') {
+            if(!message) return console.log(errorLog('No message was provided to use.'));
+
+            if(this.displayType === 'detailed') {
+                return `${chalk.red('[ERROR]')} ${chalk.cyan('[WEBSOCKET]')} ${chalk.gray(`[${moment().format('HH:mm:ss DD/MM/YY')}]`)} ${message}`
+            }
+            else if(this.displayType === 'minimal') {
+                return `${chalk.red('[ERROR]')} ${chalk.cyan('[WEBSOCKET]')} ${message}`;
             }
         }
     }
