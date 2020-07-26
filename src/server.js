@@ -3,8 +3,8 @@ const { connect } = require('mongoose');
 const KeyModel = require('../models/Key');
 const FireModel = require('../models/Fire');
 const WebSocketManager = require('./WebSocketManager');
-let LogManager = require('../etc/Logger');
-const LogManagerClient = new LogManager('minimal');
+let LogManager = require('../util/Logger');
+const LogManagerClient = new LogManager();
 const chalk = require('chalk');
 const http = require('http')
 const sio = require('socket.io');
@@ -177,7 +177,7 @@ app.delete('/fires', async (req, res) => {
     }
     let dbLoc = await FireModel.findOne({ locCode: locCode })
     if(!dbLoc) {
-        console.log(LogManagerClient.warnLog('User attempted to delete a location which didn\'t exist. Location ID ' + chalk.cyan(locCode)));
+        console.log(LogManagerClient.warnLog('User attempted to delete a location which doesn\'t exist. Location ID ' + chalk.cyan(locCode)));
         return res.status(404).json({
             "message": "This location code does not exist in the database. \nThis generally means that either the code is invalid or no fires have ever occurred in the area."
         }).send();
