@@ -116,9 +116,6 @@ app.post('/fires', async (req, res) => {
                 timestamp: Date.now(),
                 humanFriendlyTimestamp: moment().format("HH:mma ddd D/M/YY"),
                 instantiatedBy: auth 
-            }],
-            clients: [{
-                id: -1
             }]
         });
         await newModel.save().catch(() => {
