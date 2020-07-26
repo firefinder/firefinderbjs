@@ -1,13 +1,14 @@
 const express = require('express');
+const app = express();
+const http = require('http')
 const { connect } = require('mongoose');
 const KeyModel = require('../models/Key');
 const FireModel = require('../models/Fire');
 const WebSocketManager = require('./WebSocketManager');
+let wsman = new WebSocketManager(4500, app);
 let LogManager = require('../util/Logger');
 const LogManagerClient = new LogManager();
 const chalk = require('chalk');
-const http = require('http')
-const sio = require('socket.io');
 const moment = require('moment');
 const dotenv = require('dotenv');
 const { isObject } = require('util');
@@ -15,7 +16,12 @@ dotenv.config();
 const port = 4001;
 // const wss = new ws.Server({ port:port });
 
-const app = express()
+wsman.wss.on('connection', ws => {
+    console.log('New connection')
+})
+
+wsman.emit('Hello!', true)
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -258,12 +264,6 @@ app.patch('/fires', async (req, res) => {
 
 app.listen(process.env.PORT);
 console.log(LogManagerClient.infoLog(`Listening on port ${process.env.PORT}`));
-const server = http.createServer(app)
-var io = sio(server);
-
-io.on("connection", client => {
-    console.log(client);
-});
 
 (async () => {
     connect(process.env.MONGODB_URI, {
