@@ -1,13 +1,6 @@
 const moment = require('moment');
 const chalk = require('chalk');
 
-/**
- * GeneralLog is the manager for all logs.
- * @param {Message} message The message used for the log.
- * @param {?displayType} displayType The display method returned for the log.
- * @param {?type} type Where this function is being called from (this file, WebSocketManager)
-*/
-
 class GeneralLog {
     constructor(_displayType, notifyInternally) {
         if(notifyInternally === undefined) {

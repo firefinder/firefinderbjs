@@ -2,10 +2,6 @@ const GeneralLog = require("../util/Logger");
 const ws = require('ws');
 const http = require('http')
 
-/**
- * @param {Port} port The port the websocket server will be hosted on.
-*/
-
 class WebSocketManager extends GeneralLog {
     constructor(port, express) {
         super('minimal', false);
